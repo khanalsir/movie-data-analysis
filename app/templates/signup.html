@@ -1,0 +1,124 @@
+{% extends "common.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block commoncontent %}
+<div class="container mt-5" style="margin-top: 1rem!important;">
+  <form id="signupForm" method="POST" action="{{ url_for('routes.signup') }}" style="border: 1px solid #ccc; padding: 16px;">
+    <h1 class="text-center">Sign Up</h1>
+    <p class="text-center">Please fill in this form to create an account.</p>
+    <hr>
+
+    <div class="form-group">
+      <label for="username"><b>Username</b></label>
+      <input type="text" class="form-control" id="username" placeholder="Enter Username" name="username" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email"><b>Email</b></label>
+      <input type="email" class="form-control" id="email" placeholder="Enter Email" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="psw"><b>Password</b></label>
+      <input type="password" class="form-control" id="psw" placeholder="Enter Password" name="password" required>
+      <!-- Password Strength Meter -->
+      <div id="passwordStrength" class="form-group">
+        <label>Password Strength:</label>
+        <progress class="form-control" value="0" max="100" id="strength"></progress>
+        <small id="passwordHelp" class="form-text text-muted"></small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="psw-repeat"><b>Confirm Password</b></label>
+      <input type="password" class="form-control" id="psw-repeat" placeholder="Confirm Password" name="password_repeat" required>
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" class="form-check-input" id="remember" checked="checked" name="remember">
+      <label class="form-check-label" for="remember">Remember me</label>
+    </div>
+
+    <p>By creating an account you agree to our <a href="#" style="color: dodgerblue;">Terms & Privacy</a>.</p>
+
+    <div class="clearfix">
+      <button type="button" class="btn btn-danger float-left" onclick="confirmCancel()">Cancel</button>
+      <button type="submit" class="btn btn-success float-right">Sign Up</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function confirmCancel() {
+    if (confirm("Are you sure you want to cancel? Your changes will be lost.")) {
+      // Redirect or perform cancel action
+    }
+  }
+
+  document.getElementById('signupForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    registerUser();
+  });
+
+  function registerUser() {
+    var username = document.getElementById('username').value;
+    var email = document.getElementById('email').value;
+    var password = document.getElementById('psw').value;
+    var confirmPassword = document.getElementById('psw-repeat').value;
+
+    // Validate password and confirm password
+    if (password !== confirmPassword) {
+      alert("Password and Confirm Password do not match.");
+      return;
+    }
+
+    // Create a user object
+    var user = {
+      username: username,
+      email: email,
+      password: password
+    };
+
+    // Call the registerUser API endpoint using fetch or another method
+    fetch('/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user)
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert(data.message);
+      // Redirect to login page or perform other actions
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+
+  // Password Strength Meter
+  var passwordInput = document.getElementById('psw');
+  var strengthMeter = document.getElementById('strength');
+  var passwordHelp = document.getElementById('passwordHelp');
+
+  passwordInput.addEventListener('input', function () {
+    var strength = calculatePasswordStrength(passwordInput.value);
+    strengthMeter.value = strength;
+    passwordHelp.textContent = getStrengthLabel(strength);
+  });
+
+  function calculatePasswordStrength(password) {
+    // Implement your password strength calculation logic
+    // Return a value between 0 and 100
+    return 0;
+  }
+
+  function getStrengthLabel(strength) {
+    // Implement your password strength label logic
+    // Return a text label based on the strength value
+    return '';
+  }
+</script>
+{% endblock %}

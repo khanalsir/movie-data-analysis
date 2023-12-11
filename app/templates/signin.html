@@ -1,0 +1,56 @@
+<!-- ... (other head content) -->
+
+{% block title %}Sign In{% endblock %}
+
+{% block commoncontent %}
+<section class="h-100 gradient-form" style="background-color: #eee;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-6">
+        <div class="card rounded-3 text-black">
+          <div class="card-body p-md-5 mx-md-4">
+            <form id="loginForm" method="POST" action="{{ url_for('routes.signin') }}">
+              <p class="font-weight-bold text-center mb-4" style="font-size: 24px;">Sign In to Your Account</p>
+
+              <div class="form-outline mb-4">
+                <input type="email" id="email" class="form-control" name="email" placeholder="Email address" required aria-label="Email address">
+                <label class="form-label" for="email">Email address</label>
+              </div>
+
+              <div class="form-outline mb-4">
+                <input type="password" id="password" class="form-control" name="password" required aria-label="Password">
+                <label class="form-label" for="password">Password</label>
+              </div>
+
+              <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember" aria-label="Remember me">
+                <label class="form-check-label" for="remember">Remember me</label>
+              </div>
+
+              <div class="text-center pt-1 mb-5 pb-1">
+                <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Login</button>
+                <a class="text-muted" href="{{ url_for('routes.signin') }}">Forgot password?</a>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-center pb-4">
+                <p class="mb-0 me-2">Don't have an account?</p>
+                <a href="{{ url_for('routes.signup') }}" class="btn btn-outline-danger">Sign Up</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section with Image -->
+      <div class="col-md-6 d-flex align-items-center justify-content-center">
+        <img src="{{ url_for('static', filename='images/signin.jpeg') }}" class="img-fluid" alt="Image Description" style="height: 520px;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // You can remove the onLogin and redirectToSignUp functions from the script.
+  // The form action attribute will handle the redirection after form submission.
+</script>
+{% endblock %}

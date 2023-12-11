@@ -1,0 +1,26 @@
+{% extends "common.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block commoncontent %}
+  <!-- Home Section -->
+  <div id="home" class="jumbotron">
+    <h1 class="display-4">Best Solution to invest in movie</h1>
+    <p class="lead">You Can See Your Movie Information Here.</p>
+    <a class="btn btn-primary btn-lg" href="#video" role="button">Watch Video</a>
+  </div>
+
+  <!-- Body Content -->
+  <div id="video" class="container feature-section">
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Why Choose MASS Movie Data Analysis App?</h2>
+        <p>Your best solution for movie information tracking. Use this to invest in your new movie porject.</p>
+      </div>
+      <div class="col-md-6">
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/jDDaplaOz7Q" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
