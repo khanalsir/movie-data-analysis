@@ -4,47 +4,6 @@ from bs4 import BeautifulSoup
 
 class MovieDataExtractor:
     @staticmethod
-    def extract_all_moviessss():
-        # Fetch movies from the TMDb website
-        movies_list = []
-        url1 = 'https://api.themoviedb.org/3/movie/550?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url2 = 'https://api.themoviedb.org/3/movie/500?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url3 = 'https://api.themoviedb.org/3/movie/201?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url4 = 'https://api.themoviedb.org/3/movie/450?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url5 = 'https://api.themoviedb.org/3/movie/97?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url6 = 'https://api.themoviedb.org/3/movie/100?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url7 = 'https://api.themoviedb.org/3/movie/98?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url8 = 'https://api.themoviedb.org/3/movie/301?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url9 = 'https://api.themoviedb.org/3/movie/256?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url10 = 'https://api.themoviedb.org/3/movie/300?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url11 = 'https://api.themoviedb.org/3/movie/205?api_key=361a7ba69f67610c7fe99936704d4d54'
-        url12 = 'https://api.themoviedb.org/3/movie/502?api_key=361a7ba69f67610c7fe99936704d4d54'
-
-        movie_urls = [url1, url2, url3, url4, url5, url6, url7, url8, url9, url10, url11, url12]
-        movie_items = []
-        for i in movie_urls:
-            html_page = requests.get(i)
-            soup = BeautifulSoup(html_page.content, 'html.parser')
-            # Adjust the selector based on the actual HTML structure of the page
-            movie_items.extend(soup.select('div.item'))  # Use extend to add elements to the list
-
-        for movie_item in movie_items:
-            title = movie_item.find('img')['alt']
-            print(title + "sssssss")
-            img_url = movie_item.find('img')['src']
-            rating = movie_item.find('span', class_='average-rating').text.strip()
-            movie_url = 'https://www.themoviedb.org' + movie_item.find('a', class_='film-poster')['href']
-
-            movies_list.append({
-                'title': title,
-                'img_url': img_url,
-                'rating': rating,
-                'movie_url': movie_url
-            })
-
-        return movies_list
-
-    @staticmethod
     def extract_all_movies():
 
         data = []
@@ -54,21 +13,30 @@ class MovieDataExtractor:
         )
 
         for e in soup.select('li.listitem'):
+            movie_url = 'https://letterboxd.com' + e.div.get('data-film-slug')
+            # Correct the movie URL
+            index_of_com = movie_url.find("com")
+            corrected_url = movie_url[:index_of_com] + "com/film/" + movie_url[index_of_com + 3:]
+
+            # Make a request to the corrected URL
+            corrected_page = requests.get(corrected_url)
+            corrected_soup = BeautifulSoup(corrected_page.text, 'html.parser')
+
+            # Extract the image URL from the corrected page
+            new_img_url = corrected_soup.select_one('meta[property="og:image"]')['content']
+
             data.append({
                 'title': e.img.get('alt'),
-                'img_url': e.img.get('src'),
+                'img_url': new_img_url,  # e.img.get('src')
                 'rating': e.get('data-average-rating'),
-                'movie_url': 'https://letterboxd.com' + e.div.get('data-film-slug')
+                'movie_url': corrected_url
             })
         return data
 
     @staticmethod
     def extract_movie_data(imdb_id):
-        omdb_api_key = "your_omdb_api_key"
-        omdb_url = f'http://www.omdbapi.com/?i={imdb_id}&apikey={omdb_api_key}'
-
         try:
-            response = requests.get(omdb_url)
+            response = requests.get(imdb_id)
             response.raise_for_status()
             return response.json() if response.status_code == 200 else None
         except requests.exceptions.RequestException as e:
@@ -77,9 +45,22 @@ class MovieDataExtractor:
 
     @staticmethod
     def extract_movie_info(imdb_id):
-        movie_data = MovieDataExtractor.extract_movie_data(imdb_id)
 
-        if movie_data:
+        # Correct the movie URL
+        # imdb id is url for now
+        index_of_com = imdb_id.find("com")
+        corrected_url = imdb_id[:index_of_com] + "com/film/" + imdb_id[index_of_com + 3:]
+
+        # Make a request to the corrected URL
+        corrected_page = requests.get(corrected_url)
+        corrected_soup = BeautifulSoup(corrected_page.text, 'html.parser')
+
+        # Extract the image URL from the corrected page
+        new_img_url = corrected_soup.select_one('meta[property="og:image"]')['content']
+
+        movie_data = MovieDataExtractor.extract_movie_data(new_img_url)
+
+        if new_img_url:
             # Extract relevant information from the API response
             title = movie_data.get('Title')
             storyline = movie_data.get('Plot')
