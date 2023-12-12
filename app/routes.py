@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 
 from app import db, login_manager
-from app.models import User
+from app.models import User, Movie, Review
+from app.services.MovieDataExtractor import MovieDataExtractor
 
 routes = Blueprint('routes', __name__)
 
@@ -66,3 +67,29 @@ def signout():
 @login_required
 def dashboard():
     return render_template('dashboard.html')
+
+
+@routes.route('/movies', methods=['GET', 'POST'])
+def movies():
+    # Extract movies for the current year (you can customize this)
+    movies = MovieDataExtractor.extract_all_movies()
+    print(movies)
+    if request.method == 'POST':
+        # Handle form submission or filtering if needed
+        pass
+
+    return render_template('movies.html', movies=movies)
+
+
+@routes.route('/movie_detail/<imdb_id>')
+@login_required
+def movie_detail(imdb_id):
+    movie = Movie.query.filter_by(imdb_id=imdb_id).first()
+    return render_template('movie_detail.html', movie=movie)
+
+
+@routes.route('/my_movies')
+@login_required
+def my_movies():
+    reviews = Review.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_movies.html', reviews=reviews)

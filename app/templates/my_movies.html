@@ -1,0 +1,25 @@
+{% extends "common.html" %}
+
+{% block title %}My Movies{% endblock %}
+
+{% block commoncontent %}
+  <div class="container">
+    <h1>My Movies</h1>
+    {% if reviews %}
+      <div class="row">
+        {% for review in reviews %}
+          <div class="col-md-3 mb-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ review.movie.title }}</h5>
+                <p class="card-text">{{ review.text }}</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No movies reviewed yet.</p>
+    {% endif %}
+  </div>
+{% endblock %}

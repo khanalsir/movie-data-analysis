@@ -1,0 +1,67 @@
+<!-- movie_detail.html -->
+
+{% extends "common.html" %}
+
+{% block title %}Movie Detail: {{ movie.title }}{% endblock %}
+
+{% block commoncontent %}
+  <div class="container">
+    <h1>{{ movie.title }}</h1>
+    <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+    <p>Storyline: {{ movie.storyline }}</p>
+    <p>Actors: {{ movie.actors }}</p>
+    <p>Director: {{ movie.director }}</p>
+    <p>Length: {{ movie.length }} minutes</p>
+    <p>Genre: {{ movie.genre }}</p>
+    <p>Budget: {{ movie.budget }}</p>
+    <p>Collection: {{ movie.collection }}</p>
+    <p>Release Date: {{ movie.release_date|strftime('%Y-%m-%d') }}</p>
+
+    {% if current_user.is_authenticated %}
+      <!-- Add a form for user reviews -->
+      <form method="post" id="reviewForm">
+        <label for="review">Add a Review:</label>
+        <textarea name="review" id="review" required></textarea>
+        <button type="button" onclick="submitReview()">Submit Review</button>
+      </form>
+    {% else %}
+      <p>You need to <a href="{{ url_for('authenticate.sign_in') }}">sign in</a> to review movies.</p>
+    {% endif %}
+
+    <!-- Display existing reviews -->
+    <div>
+      <h2>Reviews</h2>
+      {% for review in movie.reviews %}
+        <p><strong>{{ review.user.first_name }}</strong>: {{ review.text }}</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script>
+    function submitReview() {
+      var text = document.getElementById('review').value;
+      var movie_id = "{{ movie.imdb_id }}";
+      var data = { movie_id: movie_id, text: text };
+
+      // Add client-side form validation logic here
+
+      fetch('/submit_review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        if (data.success) {
+          var reviewsContainer = document.querySelector('#reviewForm + div');
+          var newReviewElement = document.createElement('p');
+          newReviewElement.innerHTML = `<strong>You</strong>: ${text}`;
+          reviewsContainer.appendChild(newReviewElement);
+        }
+      });
+    }
+  </script>
+{% endblock %}
