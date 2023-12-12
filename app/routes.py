@@ -67,7 +67,12 @@ def signout():
 @routes.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    # Example data for the chart (replace this with your actual data)
+    chart_data = {
+        'labels': ['2019', '2020', '2021', '2022', '2023'],
+        'data': [50, 80, 120, 90, 110],
+    }
+    return render_template('dashboard.html', current_user=current_user, chart_data=chart_data)
 
 
 @routes.route('/movies', methods=['GET', 'POST'])
@@ -86,6 +91,7 @@ def movies():
 @login_required
 def movie_detail(imdb_id):
     movie = Movie.query.filter_by(imdb_id=imdb_id).first()
+    movies_info = MovieDataExtractor.extract_movie_info(imdb_id)
     return render_template('movie_detail.html', movie=movie)
 
 
@@ -94,4 +100,3 @@ def movie_detail(imdb_id):
 def my_movies():
     reviews = Review.query.filter_by(user_id=current_user.id).all()
     return render_template('my_movies.html', reviews=reviews)
-

@@ -38,7 +38,8 @@
                 <img src="{{ movie.img_url }}" alt="{{ movie.title }}" class="card-img-top">
                 <div class="card-body">
                   <h5 class="card-title">{{ movie.title }}</h5>
-                  <a href="{{ url_for('routes.movie_detail', imdb_id=movie.imdb_id) }}" class="btn btn-primary">View Details</a>
+                  <!-- <a href="{{ movie.movie_url }}" class="btn btn-primary" id="viewdtl">View Details</a> -->
+                  <a href=" movie_de + "/" + {{movie.movie_url}} }}" class="btn btn-primary" id="viewdtl">View Details</a>
                 </div>
               </div>
             </div>
@@ -54,15 +55,13 @@
       function submitForm() {
         var formData = $('#filterForm').serialize();
 
-        // Show loading spinner or other visual feedback here
-
         $.ajax({
           type: 'POST',
           url: "{{ url_for('routes.movies') }}",
           data: formData,
           success: function (data) {
             $('#movieList').html(data);
-            // To Do hide loading spinner or other visual feedback here
+
           },
           error: function () {
             // Handle error and provide feedback to the user
@@ -75,5 +74,8 @@
         submitForm();
       });
     });
+    $('#viewdtl').onclick(function (event){
+        routes.movie_detail(movie.movie_url)
+    })
   </script>
 {% endblock %}
