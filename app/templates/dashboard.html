@@ -6,18 +6,29 @@
 <div class="container mt-5">
   <h1 class="text-center">Welcome to Your Dashboard, {{ current_user.username }}!</h1>
   <p class="text-center">Here, you can explore and manage your movie-related activities.</p>
+
+  <!-- Bar Chart -->
   <div class="text-center mt-4">
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <canvas id="barChart" width="100" height="100"></canvas>
   </div>
+
+  <!-- Pie Chart -->
+  <div class="text-center mt-4">
+    <canvas id="pieChart" width="100" height="100"></canvas>
+  </div>
+
 </div>
 
 <!-- Include Chart.js library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
 <script>
-  // Use Chart.js to render the chart
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var myChart = new Chart(ctx, {
+  // Bar Chart
+  var ctxBar = document.getElementById('barChart').getContext('2d');
+  var barChart = new Chart(ctxBar, {
     type: 'bar',
     data: {
       labels: {{ chart_data['labels'] | tojson }},
@@ -34,8 +45,71 @@
         y: {
           beginAtZero: true
         }
+      },
+      plugins: {
+        legend: {
+          display: true
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': ' + context.parsed.y;
+            }
+          }
+        }
+      },
+      hover: {
+        onHover: function(event, chartElement) {
+          event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+        }
+      },
+      onClick: function(event, element) {
+        var activePoint = barChart.getElementAtEvent(event);
+
+        if (activePoint.length > 0) {
+          var csvButton = document.getElementById('exportCSV');
+          csvButton.style.display = 'block';
+          csvButton.onclick = function() {
+            exportToCSV(activePoint);
+          };
+        }
       }
     }
   });
+
+  // Function to export data to CSV
+  function exportToCSV(activePoint) {
+    var data = {
+      labels: barChart.data.labels,
+      datasets: [{
+        label: activePoint[0].dataset.label,
+        data: activePoint[0].dataset.data
+      }]
+    };
+
+    // Convert data to CSV format
+    var csv = Papa.unparse(data);
+
+    // Send CSV data to the server for file creation
+    fetch('/export_csv', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ csvData: csv })
+    }).then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Network response was not ok.');
+    }).then(data => {
+      alert(data.message);
+    }).catch(error => {
+      console.error('Error:', error);
+    });
+  }
 </script>
+
+<!-- Export CSV button -->
+<button id="exportCSV" style="display: none;">Export to CSV</button>
 {% endblock %}

@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import os
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 
 from app import db, login_manager
@@ -75,6 +77,29 @@ def dashboard():
     return render_template('dashboard.html', current_user=current_user, chart_data=chart_data)
 
 
+@routes.route('/export_csv', methods=['POST'])
+def export_csv():
+    try:
+        data = request.get_json()
+        csv_data = data['csvData']
+
+        # Create the 'files' directory if it doesn't exist
+        directory = 'files'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Create a unique filename for the CSV file
+        csv_filename = os.path.join(directory, 'movies_data.csv')
+
+        # Save the CSV data to a file
+        with open(csv_filename, 'w') as csv_file:
+            csv_file.write(csv_data)
+
+        return jsonify({'message': 'CSV file exported successfully.'})
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}'}), 500
+
+
 @routes.route('/movies', methods=['GET', 'POST'])
 def movies():
     # Extract movies for the current year (you can customize this)
@@ -90,9 +115,9 @@ def movies():
 @routes.route('/movie_detail/<imdb_id>')
 @login_required
 def movie_detail(imdb_id):
-    movie = Movie.query.filter_by(imdb_id=imdb_id).first()
+    # movie = Movie.query.filter_by(imdb_id=imdb_id).first()
     movies_info = MovieDataExtractor.extract_movie_info(imdb_id)
-    return render_template('movie_detail.html', movie=movie)
+    return render_template('movie_detail.html', movie=movies_info)
 
 
 @routes.route('/my_movies')
