@@ -41,9 +41,9 @@
         <ul class="navbar-nav ml-auto">
             <li class="nav-item active"><a class="nav-link" href="{{ url_for('routes.home') }}">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.home') }}">About Us</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.home') }}">Movies</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.movies') }}">Movies</a></li>
             {% if current_user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.home') }}">My Movies</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.my_movies') }}">My Movies</a></li>
             {% endif %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.home') }}">Charts</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('routes.home') }}">Contact</a></li>
