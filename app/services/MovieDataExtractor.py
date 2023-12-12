@@ -12,7 +12,9 @@ class MovieDataExtractor:
             requests.get('https://letterboxd.com/films/ajax/popular/decade/1980s/?esiAllowFilters=true').text
         )
 
-        for e in soup.select('li.listitem'):
+        for index, e in enumerate(soup.select('li.listitem')):
+            if index == 24:
+                break
             movie_url = 'https://letterboxd.com' + e.div.get('data-film-slug')
             # Correct the movie URL
             index_of_com = movie_url.find("com")

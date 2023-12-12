@@ -38,8 +38,8 @@
                 <img src="{{ movie.img_url }}" alt="{{ movie.title }}" class="card-img-top">
                 <div class="card-body">
                   <h5 class="card-title">{{ movie.title }}</h5>
-                  <!-- <a href="{{ movie.movie_url }}" class="btn btn-primary" id="viewdtl">View Details</a> -->
-                  <a href=" movie_de + "/" + {{movie.movie_url}} }}" class="btn btn-primary" id="viewdtl">View Details</a>
+                  <a href="{{ movie.movie_url }}" class="btn btn-primary" id="viewdtl">View Details</a>
+                 <!-- <a href="{{ url_for('routes.movie_detail', imdb_id=movie.imdb_id) }}" class="btn btn-primary btn-view-details">View Details</a> -->
                 </div>
               </div>
             </div>
@@ -74,8 +74,10 @@
         submitForm();
       });
     });
-    $('#viewdtl').onclick(function (event){
-        routes.movie_detail(movie.movie_url)
-    })
+    $('#movieList').on('click', '.btn-view-details', function (event) {
+    event.preventDefault();
+    var movieUrl = $(this).attr('data-movie-url');
+    window.location.href = movieUrl;
+  });
   </script>
 {% endblock %}
