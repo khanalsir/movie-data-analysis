@@ -93,3 +93,4 @@ def movie_detail(imdb_id):
 def my_movies():
     reviews = Review.query.filter_by(user_id=current_user.id).all()
     return render_template('my_movies.html', reviews=reviews)
+
