@@ -60,6 +60,7 @@ def signin():
 @login_required
 def signout():
     logout_user()
+    flash('You have been signed out.', 'success')
     return redirect(url_for('routes.home'))
 
 
@@ -72,13 +73,13 @@ def dashboard():
 @routes.route('/movies', methods=['GET', 'POST'])
 def movies():
     # Extract movies for the current year (you can customize this)
-    movies = MovieDataExtractor.extract_all_movies()
-    print(movies)
+    movies_info = MovieDataExtractor.extract_all_movies()
+    print(movies_info)
     if request.method == 'POST':
         # Handle form submission or filtering if needed
-        pass
+        return render_template('movies.html', movies=movies_info)
 
-    return render_template('movies.html', movies=movies)
+    return render_template('movies.html', movies=movies_info)
 
 
 @routes.route('/movie_detail/<imdb_id>')

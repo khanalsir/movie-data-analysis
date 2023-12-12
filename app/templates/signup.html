@@ -79,7 +79,7 @@
       password: password
     };
 
-    // Call the registerUser API endpoint using fetch or another method
+    // Call the registerUser API
     fetch('/signup', {
       method: 'POST',
       headers: {
@@ -90,7 +90,7 @@
     .then(response => response.json())
     .then(data => {
       alert(data.message);
-      // Redirect to login page or perform other actions
+      {{ url_for('routes.signin') }}
     })
     .catch(error => {
       console.error('Error:', error);
