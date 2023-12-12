@@ -4,15 +4,29 @@ from bs4 import BeautifulSoup
 
 class MovieDataExtractor:
     @staticmethod
-    def extract_all_movies():
+    def extract_all_moviessss():
         # Fetch movies from the TMDb website
         movies_list = []
-        url = 'https://www.themoviedb.org/movie/top-rated'
-        html_page = requests.get(url)
-        soup = BeautifulSoup(html_page.content, 'html.parser')
+        url1 = 'https://api.themoviedb.org/3/movie/550?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url2 = 'https://api.themoviedb.org/3/movie/500?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url3 = 'https://api.themoviedb.org/3/movie/201?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url4 = 'https://api.themoviedb.org/3/movie/450?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url5 = 'https://api.themoviedb.org/3/movie/97?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url6 = 'https://api.themoviedb.org/3/movie/100?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url7 = 'https://api.themoviedb.org/3/movie/98?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url8 = 'https://api.themoviedb.org/3/movie/301?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url9 = 'https://api.themoviedb.org/3/movie/256?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url10 = 'https://api.themoviedb.org/3/movie/300?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url11 = 'https://api.themoviedb.org/3/movie/205?api_key=361a7ba69f67610c7fe99936704d4d54'
+        url12 = 'https://api.themoviedb.org/3/movie/502?api_key=361a7ba69f67610c7fe99936704d4d54'
 
-        # Adjust the selector based on the actual HTML structure of the page
-        movie_items = soup.select('div.item')  # Example selector; adjust as needed
+        movie_urls = [url1, url2, url3, url4, url5, url6, url7, url8, url9, url10, url11, url12]
+        movie_items = []
+        for i in movie_urls:
+            html_page = requests.get(i)
+            soup = BeautifulSoup(html_page.content, 'html.parser')
+            # Adjust the selector based on the actual HTML structure of the page
+            movie_items.extend(soup.select('div.item'))  # Use extend to add elements to the list
 
         for movie_item in movie_items:
             title = movie_item.find('img')['alt']
@@ -29,6 +43,24 @@ class MovieDataExtractor:
             })
 
         return movies_list
+
+    @staticmethod
+    def extract_all_movies():
+
+        data = []
+
+        soup = BeautifulSoup(
+            requests.get('https://letterboxd.com/films/ajax/popular/decade/1980s/?esiAllowFilters=true').text
+        )
+
+        for e in soup.select('li.listitem'):
+            data.append({
+                'title': e.img.get('alt'),
+                'img_url': e.img.get('src'),
+                'rating': e.get('data-average-rating'),
+                'movie_url': 'https://letterboxd.com' + e.div.get('data-film-slug')
+            })
+        return data
 
     @staticmethod
     def extract_movie_data(imdb_id):
