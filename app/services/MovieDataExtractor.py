@@ -36,6 +36,16 @@ class MovieDataExtractor:
         return data
 
     @staticmethod
+    def filter_movies(filter_string):
+        # Fetch data from extract_all_movies method
+        data = extract_all_movies()
+
+        # Use a list comprehension to filter data based on the specified condition
+        filtered_data = [item for item in data if item.get("title") == filter_string]
+
+        return filtered_data
+
+    @staticmethod
     def extract_movie_data(imdb_id):
         try:
             response = requests.get(imdb_id)
