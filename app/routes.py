@@ -104,8 +104,18 @@ def export_csv():
 def movies():
     # Extract movies for the current year (you can customize this)
     movies_info = MovieDataExtractor.extract_all_movies()
-    print(movies_info)
+    year_filter = request.form.get('year')
+    search_term = request.form.get('search_term')
+    #print(movies_info)
     if request.method == 'POST':
+        if year_filter:
+            movies_info = [movie for movie in movies_info if movie.get('year') == int(year_filter)]
+        if search_term:
+            print("It goes here")
+            movies_info = [movie for movie in movies_info if
+                           search_term.lower() in movie.get('title', '').lower() or search_term.lower() in movie.get(
+                               'genre', '').lower()]
+            print(movies_info)
         # Handle form submission or filtering if needed
         return render_template('movies.html', movies=movies_info)
 
