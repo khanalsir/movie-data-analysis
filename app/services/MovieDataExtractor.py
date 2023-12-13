@@ -1,3 +1,5 @@
+import time
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -5,34 +7,39 @@ from bs4 import BeautifulSoup
 class MovieDataExtractor:
     @staticmethod
     def extract_all_movies():
-
         data = []
+        base_url = 'https://letterboxd.com'
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
-        soup = BeautifulSoup(
-            requests.get('https://letterboxd.com/films/ajax/popular/decade/1980s/?esiAllowFilters=true').text
-        )
+        with requests.Session() as session:
+            response = session.get(base_url + '/films/ajax/popular/decade/1980s/?esiAllowFilters=true', headers=headers)
+            soup = BeautifulSoup(response.text, 'lxml')
 
-        for index, e in enumerate(soup.select('li.listitem')):
-            if index == 24:
-                break
-            movie_url = 'https://letterboxd.com' + e.div.get('data-film-slug')
-            # Correct the movie URL
-            index_of_com = movie_url.find("com")
-            corrected_url = movie_url[:index_of_com] + "com/film/" + movie_url[index_of_com + 3:]
+            for index, e in enumerate(soup.select('li.listitem')):
+                if index == 24:
+                    break
 
-            # Make a request to the corrected URL
-            corrected_page = requests.get(corrected_url)
-            corrected_soup = BeautifulSoup(corrected_page.text, 'html.parser')
+                movie_url = base_url + e['data-film-slug']
+                index_of_com = movie_url.find("com")
+                corrected_url = movie_url[:index_of_com] + "com/film/" + movie_url[index_of_com + 3:]
 
-            # Extract the image URL from the corrected page
-            new_img_url = corrected_soup.select_one('meta[property="og:image"]')['content']
+                # Make a request to the corrected URL
+                corrected_page = session.get(corrected_url, headers=headers)
+                corrected_soup = BeautifulSoup(corrected_page.text, 'lxml')
 
-            data.append({
-                'title': e.img.get('alt'),
-                'img_url': new_img_url,  # e.img.get('src')
-                'rating': e.get('data-average-rating'),
-                'movie_url': corrected_url
-            })
+                # Extract the image URL from the corrected page
+                new_img_url = corrected_soup.select_one('meta[property="og:image"]')['content']
+
+                data.append({
+                    'title': e.img['alt'],
+                    'img_url': new_img_url,  # e.img['src']
+                    'rating': e.get('data-average-rating'),
+                    'movie_url': corrected_url
+                })
+
+                # Add a delay between requests to avoid rate limiting
+                time.sleep(1)
+
         return data
 
     @staticmethod
